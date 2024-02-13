@@ -1,0 +1,16 @@
+**/node_modules/
+**/artifacts/
+**/cache/
+**/typechain/
+**/typechain-types/
+**/data/abi
+**/coverage
+**/coverage.json
+**/.env
+.idea
+.vscode
+.DS_Store
+bytecode
+dist
+yarn.lock
+**/hardhat.json

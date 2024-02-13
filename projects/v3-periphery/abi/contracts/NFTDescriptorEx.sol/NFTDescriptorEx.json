@@ -1,0 +1,186 @@
+[
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "oldOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnerChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "switchToHttpLink",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "NFTDomain",
+        "type": "string"
+      }
+    ],
+    "name": "ToggleSwitchAndUpdateNFTDomain",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "tokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "quoteTokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "baseTokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "quoteTokenSymbol",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "baseTokenSymbol",
+            "type": "string"
+          },
+          {
+            "internalType": "uint8",
+            "name": "quoteTokenDecimals",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "baseTokenDecimals",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "flipRatio",
+            "type": "bool"
+          },
+          {
+            "internalType": "int24",
+            "name": "tickLower",
+            "type": "int24"
+          },
+          {
+            "internalType": "int24",
+            "name": "tickUpper",
+            "type": "int24"
+          },
+          {
+            "internalType": "int24",
+            "name": "tickCurrent",
+            "type": "int24"
+          },
+          {
+            "internalType": "int24",
+            "name": "tickSpacing",
+            "type": "int24"
+          },
+          {
+            "internalType": "uint24",
+            "name": "fee",
+            "type": "uint24"
+          },
+          {
+            "internalType": "address",
+            "name": "poolAddress",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct NFTDescriptorEx.ConstructTokenURIParams",
+        "name": "params",
+        "type": "tuple"
+      }
+    ],
+    "name": "constructTokenURI",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "name": "setOwner",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_switchToHttpLink",
+        "type": "bool"
+      },
+      {
+        "internalType": "string",
+        "name": "_NFTDomain",
+        "type": "string"
+      }
+    ],
+    "name": "toggleSwitchAndUpdateNFTDomain",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

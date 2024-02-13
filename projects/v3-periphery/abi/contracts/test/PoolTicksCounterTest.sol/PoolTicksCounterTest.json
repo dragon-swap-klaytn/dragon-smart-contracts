@@ -1,0 +1,31 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "contract IPancakeV3Pool",
+        "name": "pool",
+        "type": "address"
+      },
+      {
+        "internalType": "int24",
+        "name": "tickBefore",
+        "type": "int24"
+      },
+      {
+        "internalType": "int24",
+        "name": "tickAfter",
+        "type": "int24"
+      }
+    ],
+    "name": "countInitializedTicksCrossed",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "initializedTicksCrossed",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

@@ -1,0 +1,226 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "pool",
+        "type": "address"
+      },
+      {
+        "internalType": "uint32",
+        "name": "secondsAgo",
+        "type": "uint32"
+      }
+    ],
+    "name": "consult",
+    "outputs": [
+      {
+        "internalType": "int24",
+        "name": "arithmeticMeanTick",
+        "type": "int24"
+      },
+      {
+        "internalType": "uint128",
+        "name": "harmonicMeanLiquidity",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "pool",
+        "type": "address"
+      }
+    ],
+    "name": "getBlockStartingTickAndLiquidity",
+    "outputs": [
+      {
+        "internalType": "int24",
+        "name": "",
+        "type": "int24"
+      },
+      {
+        "internalType": "uint128",
+        "name": "",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "tokens",
+        "type": "address[]"
+      },
+      {
+        "internalType": "int24[]",
+        "name": "ticks",
+        "type": "int24[]"
+      }
+    ],
+    "name": "getChainedPrice",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "syntheticTick",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "pool",
+        "type": "address"
+      },
+      {
+        "internalType": "uint32",
+        "name": "period",
+        "type": "uint32"
+      }
+    ],
+    "name": "getGasCostOfConsult",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "int24",
+        "name": "tick",
+        "type": "int24"
+      },
+      {
+        "internalType": "uint128",
+        "name": "baseAmount",
+        "type": "uint128"
+      },
+      {
+        "internalType": "address",
+        "name": "baseToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "quoteToken",
+        "type": "address"
+      }
+    ],
+    "name": "getGasCostOfGetQuoteAtTick",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "pool",
+        "type": "address"
+      }
+    ],
+    "name": "getOldestObservationSecondsAgo",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "secondsAgo",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "currentTimestamp",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "int24",
+        "name": "tick",
+        "type": "int24"
+      },
+      {
+        "internalType": "uint128",
+        "name": "baseAmount",
+        "type": "uint128"
+      },
+      {
+        "internalType": "address",
+        "name": "baseToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "quoteToken",
+        "type": "address"
+      }
+    ],
+    "name": "getQuoteAtTick",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "quoteAmount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "int24",
+            "name": "tick",
+            "type": "int24"
+          },
+          {
+            "internalType": "uint128",
+            "name": "weight",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct OracleLibrary.WeightedTickData[]",
+        "name": "observations",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "getWeightedArithmeticMeanTick",
+    "outputs": [
+      {
+        "internalType": "int24",
+        "name": "arithmeticMeanWeightedTick",
+        "type": "int24"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  }
+]

@@ -1,0 +1,60 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "tokens",
+        "type": "address[]"
+      },
+      {
+        "internalType": "address[]",
+        "name": "baseTokens",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountToBorrow",
+        "type": "uint256"
+      }
+    ],
+    "name": "batchValidate",
+    "outputs": [
+      {
+        "internalType": "enum ITokenValidator.Status[]",
+        "name": "",
+        "type": "uint8[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "address[]",
+        "name": "baseTokens",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountToBorrow",
+        "type": "uint256"
+      }
+    ],
+    "name": "validate",
+    "outputs": [
+      {
+        "internalType": "enum ITokenValidator.Status",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
