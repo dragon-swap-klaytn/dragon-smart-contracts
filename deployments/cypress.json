@@ -16,9 +16,14 @@
   "NonfungiblePositionManager": "0x68f762d28CebaD501c090949e4680697e56848fC",
   "PancakeInterfaceMulticall": "0x856B344c81f5bf5e6b7f84e1380ef7baC42B2542",
   "MasterChefV2": "0x403050782bFeedE42c002cE26525a790f2c69615",
-  "MasterChefV3": "0xa120A272a90C39e3E932ef2D18cb6d45E7485F7d",
-  "PancakeV3LmPoolDeployer": "0x52FD45a101962A61E7cCBedE9c8B5F6f6D2c76E8",
+  "MasterChefV3(deprecated)": "0xa120A272a90C39e3E932ef2D18cb6d45E7485F7d",
+  "PancakeV3LmPoolDeployer(deprecated)": "0x52FD45a101962A61E7cCBedE9c8B5F6f6D2c76E8",
   "FactoryOwner": "0x3bf69122d9462D6D5a90cacE9BfE1bED0FAC0b98",
   "MultiSigWallet": "0x1Ef09a52B32D20196cef61f0db92Fa8Cc214FB1B",
-  "PancakeInterfaceMulticallV2": "0xCFA1710d22f5d6FDC06a9Ec37cC362eAD041A4E9"
+  "PancakeInterfaceMulticallV2": "0xCFA1710d22f5d6FDC06a9Ec37cC362eAD041A4E9",
+  "Receiver(deprecated)": "0x4fb0b02fdd9fd5c999b2fe7f79c2ea7632248449",
+  "RKLAY": "0xf898c138f9c8825cef83ca75535ed77100497296",
+  "MasterChefV3": "0xB845fB78C78d349ec08d47C2cCdC564baD2f67B0",
+  "PancakeV3LmPoolDeployer": "0xf6310D6Be23a2be1891b0849F4fAf4F6C271a1FD",
+  "Receiver": "0x2E33646b115AD88A3540EE148F8e5Ea31A64dDc2"
 }

@@ -10,129 +10,203 @@ import '@pancakeswap/v3-core/contracts/interfaces/IPancakeV3Pool.sol';
 import './libraries/LmTick.sol';
 
 import './interfaces/IPancakeV3LmPool.sol';
+import './interfaces/ILMPool.sol';
 import './interfaces/IMasterChefV3.sol';
 
 contract PancakeV3LmPool is IPancakeV3LmPool {
-  using LowGasSafeMath for uint256;
-  using LowGasSafeMath for int256;
-  using SafeCast for uint256;
-  using SafeCast for int256;
-  using LmTick for mapping(int24 => LmTick.Info);
+    using LowGasSafeMath for uint256;
+    using LowGasSafeMath for int256;
+    using SafeCast for uint256;
+    using SafeCast for int256;
+    using LmTick for mapping(int24 => LmTick.Info);
 
-  uint256 public constant REWARD_PRECISION = 1e12;
+    uint256 public constant REWARD_PRECISION = 1e12;
 
-  IPancakeV3Pool public immutable pool;
-  IMasterChefV3 public immutable masterChef;
+    IPancakeV3Pool public immutable pool;
+    IMasterChefV3 public immutable masterChef;
 
-  uint256 public rewardGrowthGlobalX128;
+    uint256 public rewardGrowthGlobalX128;
 
-  mapping(int24 => LmTick.Info) public lmTicks;
+    mapping(int24 => LmTick.Info) public lmTicks;
 
-  uint128 public lmLiquidity;
+    uint128 public lmLiquidity;
 
-  uint32 public lastRewardTimestamp;
+    uint32 public lastRewardTimestamp;
 
-  modifier onlyPool() {
-    require(msg.sender == address(pool), "Not pool");
-    _;
-  }
+    // Check whether rewardGrowthInside is negative at first.
+    mapping(int24 => mapping(int24 => bool)) public negativeRewardGrowthInsideFlag;
+    // Record the first negative RewardGrowthInside value.
+    mapping(int24 => mapping(int24 => uint256)) public negativeRewardGrowthInsideInitValue;
+    // To save gas , only need to check negativeRewardGrowthInsideFlag once.
+    mapping(int24 => mapping(int24 => bool)) public checkNegativeFlag;
 
-  modifier onlyMasterChef() {
-    require(msg.sender == address(masterChef), "Not MC");
-    _;
-  }
-
-  modifier onlyPoolOrMasterChef() {
-    require(msg.sender == address(pool) || msg.sender == address(masterChef), "Not pool or MC");
-    _;
-  }
-
-  constructor(address _pool, address _masterChef, uint32 rewardStartTimestamp) {
-    pool = IPancakeV3Pool(_pool);
-    masterChef = IMasterChefV3(_masterChef);
-    lastRewardTimestamp = rewardStartTimestamp;
-  }
-
-  function accumulateReward(uint32 currTimestamp) external override onlyPoolOrMasterChef {
-    if (currTimestamp <= lastRewardTimestamp) {
-      return;
+    modifier onlyPool() {
+        require(msg.sender == address(pool), 'Not pool');
+        _;
     }
 
-    if (lmLiquidity != 0) {
-      (uint256 rewardPerSecond, uint256 endTime) = masterChef.getLatestPeriodInfo(address(pool));
-
-      uint32 endTimestamp = uint32(endTime);
-      uint32 duration;
-      if (endTimestamp > currTimestamp) {
-        duration = currTimestamp - lastRewardTimestamp;
-      } else if (endTimestamp > lastRewardTimestamp) {
-        duration = endTimestamp - lastRewardTimestamp;
-      }
-
-      if (duration != 0) {
-        rewardGrowthGlobalX128 += FullMath.mulDiv(duration, FullMath.mulDiv(rewardPerSecond, FixedPoint128.Q128, REWARD_PRECISION), lmLiquidity);
-      }
+    modifier onlyMasterChef() {
+        require(msg.sender == address(masterChef), 'Not MC');
+        _;
     }
 
-    lastRewardTimestamp = currTimestamp;
-  }
-
-  function crossLmTick(int24 tick, bool zeroForOne) external override onlyPool {
-    if (lmTicks[tick].liquidityGross == 0) {
-      return;
+    modifier onlyPoolOrMasterChef() {
+        require(msg.sender == address(pool) || msg.sender == address(masterChef), 'Not pool or MC');
+        _;
     }
 
-    int128 lmLiquidityNet = lmTicks.cross(tick, rewardGrowthGlobalX128);
-
-    if (zeroForOne) {
-      lmLiquidityNet = -lmLiquidityNet;
+    constructor(address _pool, address _masterChef, uint32 rewardStartTimestamp) {
+        pool = IPancakeV3Pool(_pool);
+        masterChef = IMasterChefV3(_masterChef);
+        lastRewardTimestamp = rewardStartTimestamp;
     }
 
-    lmLiquidity = LiquidityMath.addDelta(lmLiquidity, lmLiquidityNet);
-  }
+    function accumulateReward(uint32 currTimestamp) external override onlyPoolOrMasterChef {
+        if (currTimestamp <= lastRewardTimestamp) {
+            return;
+        }
 
-  function updatePosition(int24 tickLower, int24 tickUpper, int128 liquidityDelta) external onlyMasterChef {
-    (, int24 tick, , , , ,) = pool.slot0();
-    uint128 maxLiquidityPerTick = pool.maxLiquidityPerTick();
-    uint256 _rewardGrowthGlobalX128 = rewardGrowthGlobalX128;
+        if (lmLiquidity != 0) {
+            (uint256 rewardPerSecond, uint256 endTime) = masterChef.getLatestPeriodInfo(address(pool));
 
-    bool flippedLower;
-    bool flippedUpper;
-    if (liquidityDelta != 0) {
-      flippedLower = lmTicks.update(
-        tickLower,
-        tick,
-        liquidityDelta,
-        _rewardGrowthGlobalX128,
-        false,
-        maxLiquidityPerTick
-      );
-      flippedUpper = lmTicks.update(
-        tickUpper,
-        tick,
-        liquidityDelta,
-        _rewardGrowthGlobalX128,
-        true,
-        maxLiquidityPerTick
-      );
+            uint32 endTimestamp = uint32(endTime);
+            uint32 duration;
+            if (endTimestamp > currTimestamp) {
+                duration = currTimestamp - lastRewardTimestamp;
+            } else if (endTimestamp > lastRewardTimestamp) {
+                duration = endTimestamp - lastRewardTimestamp;
+            }
+
+            if (duration != 0) {
+                rewardGrowthGlobalX128 += FullMath.mulDiv(
+                    duration,
+                    FullMath.mulDiv(rewardPerSecond, FixedPoint128.Q128, REWARD_PRECISION),
+                    lmLiquidity
+                );
+            }
+        }
+
+        lastRewardTimestamp = currTimestamp;
     }
 
-    if (tick >= tickLower && tick < tickUpper) {
-      lmLiquidity = LiquidityMath.addDelta(lmLiquidity, liquidityDelta);
+    function crossLmTick(int24 tick, bool zeroForOne) external override onlyPool {
+        if (lmTicks[tick].liquidityGross == 0) {
+            return;
+        }
+
+        int128 lmLiquidityNet = lmTicks.cross(tick, rewardGrowthGlobalX128);
+
+        if (zeroForOne) {
+            lmLiquidityNet = -lmLiquidityNet;
+        }
+
+        lmLiquidity = LiquidityMath.addDelta(lmLiquidity, lmLiquidityNet);
     }
 
-    if (liquidityDelta < 0) {
-      if (flippedLower) {
-        lmTicks.clear(tickLower);
-      }
-      if (flippedUpper) {
-        lmTicks.clear(tickUpper);
-      }
+    /// @notice This will check the whether the range RewardGrowthInside is negative when the range ticks were initialized.
+    /// @dev This is for fixing the issues that rewardGrowthInsideX128 can be underflow on purpose.
+    /// If the rewardGrowthInsideX128 is negative , we will process it as a positive number.
+    /// Because the RewardGrowthInside is self-incrementing, so we record the initial value as zero point.
+    function _checkNegativeRewardGrowthInside(int24 tickLower, int24 tickUpper) internal {
+        if (!checkNegativeFlag[tickLower][tickUpper]) {
+            checkNegativeFlag[tickLower][tickUpper] = true;
+            (uint256 rewardGrowthInsideX128, bool isNegative) = _getRewardGrowthInsideInternal(tickLower, tickUpper);
+            if (isNegative) {
+                negativeRewardGrowthInsideFlag[tickLower][tickUpper] = true;
+                negativeRewardGrowthInsideInitValue[tickLower][tickUpper] = rewardGrowthInsideX128;
+            }
+        }
     }
-  }
 
-  function getRewardGrowthInside(int24 tickLower, int24 tickUpper) external view returns (uint256 rewardGrowthInsideX128) {
-    (, int24 tick, , , , ,) = pool.slot0();
-    return lmTicks.getRewardGrowthInside(tickLower, tickUpper, tick, rewardGrowthGlobalX128);
-  }
+    /// @notice Need to rest Negative Tick info when tick flipped.
+    function _clearNegativeTickInfo(int24 tickLower, int24 tickUpper) internal {
+        checkNegativeFlag[tickLower][tickUpper] = false;
+        negativeRewardGrowthInsideFlag[tickLower][tickUpper] = false;
+        negativeRewardGrowthInsideInitValue[tickLower][tickUpper] = 0;
+    }
+
+    function updatePosition(int24 tickLower, int24 tickUpper, int128 liquidityDelta) external onlyMasterChef {
+        (, int24 tick, , , , , ) = pool.slot0();
+        uint128 maxLiquidityPerTick = pool.maxLiquidityPerTick();
+        uint256 _rewardGrowthGlobalX128 = rewardGrowthGlobalX128;
+
+        bool flippedLower;
+        bool flippedUpper;
+        if (liquidityDelta != 0) {
+            flippedLower = lmTicks.update(
+                tickLower,
+                tick,
+                liquidityDelta,
+                _rewardGrowthGlobalX128,
+                false,
+                maxLiquidityPerTick
+            );
+            flippedUpper = lmTicks.update(
+                tickUpper,
+                tick,
+                liquidityDelta,
+                _rewardGrowthGlobalX128,
+                true,
+                maxLiquidityPerTick
+            );
+        }
+
+        if (tick >= tickLower && tick < tickUpper) {
+            lmLiquidity = LiquidityMath.addDelta(lmLiquidity, liquidityDelta);
+        }
+
+        if (liquidityDelta < 0) {
+            if (flippedLower) {
+                lmTicks.clear(tickLower);
+            }
+            if (flippedUpper) {
+                lmTicks.clear(tickUpper);
+            }
+        }
+        // Need to rest Negative Tick info when tick flipped.
+        if (liquidityDelta < 0 && (flippedLower || flippedUpper)) {
+            _clearNegativeTickInfo(tickLower, tickUpper);
+        } else {
+            _checkNegativeRewardGrowthInside(tickLower, tickUpper);
+        }
+    }
+
+    function getRewardGrowthInside(
+        int24 tickLower,
+        int24 tickUpper
+    ) external view returns (uint256 rewardGrowthInsideX128) {
+        (rewardGrowthInsideX128, ) = _getRewardGrowthInsideInternal(tickLower, tickUpper);
+        if (negativeRewardGrowthInsideFlag[tickLower][tickUpper]) {
+            rewardGrowthInsideX128 = rewardGrowthInsideX128 - negativeRewardGrowthInsideInitValue[tickLower][tickUpper];
+        }
+    }
+
+    function _getRewardGrowthInsideInternal(
+        int24 tickLower,
+        int24 tickUpper
+    ) internal view returns (uint256 rewardGrowthInsideX128, bool isNegative) {
+        (, int24 tick, , , , , ) = pool.slot0();
+        LmTick.Info memory lower = lmTicks[tickLower];
+
+        LmTick.Info memory upper = lmTicks[tickUpper];
+
+        // calculate reward growth below
+        uint256 rewardGrowthBelowX128;
+        if (tick >= tickLower) {
+            rewardGrowthBelowX128 = lower.rewardGrowthOutsideX128;
+        } else {
+            rewardGrowthBelowX128 = rewardGrowthGlobalX128 - lower.rewardGrowthOutsideX128;
+        }
+
+        // calculate reward growth above
+        uint256 rewardGrowthAboveX128;
+        if (tick < tickUpper) {
+            rewardGrowthAboveX128 = upper.rewardGrowthOutsideX128;
+        } else {
+            rewardGrowthAboveX128 = rewardGrowthGlobalX128 - upper.rewardGrowthOutsideX128;
+        }
+
+        rewardGrowthInsideX128 = rewardGrowthGlobalX128 - rewardGrowthBelowX128 - rewardGrowthAboveX128;
+        isNegative = (rewardGrowthBelowX128 + rewardGrowthAboveX128) > rewardGrowthGlobalX128;
+    }
 }
