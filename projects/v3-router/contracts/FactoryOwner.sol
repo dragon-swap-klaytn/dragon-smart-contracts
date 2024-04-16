@@ -125,6 +125,7 @@ contract FactoryOwner is Ownable {
         if (!result) {
             revert();
         }
+        emit Execute(_to, _value, _data);
     }
 
     function setOperator(address _operator, bool _b) external onlyOwner {
@@ -133,6 +134,7 @@ contract FactoryOwner is Ownable {
         emit SetOperator(_operator, _b);
     }
 
+    event Execute(address to, uint256 value, bytes data);
     event SetOperator(address operator, bool b);
     event AddFeeReceiver(address feeReceiver, uint256 weight, uint256 totalWeight);
     event RemoveFeeReceiver(address feeReceiver, uint256 totalWeight);
