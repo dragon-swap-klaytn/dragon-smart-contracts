@@ -170,10 +170,6 @@ contract FactoryOwner is Ownable {
         }
     }
 
-    function remove() external onlyOwner {
-        feeReceiver.pop();
-    }
-
     function feeReceiverLength() public view returns (uint256) {
         return feeReceiver.length;
     }
